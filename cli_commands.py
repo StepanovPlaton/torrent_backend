@@ -6,6 +6,7 @@ import database
 
 cli = typer.Typer()
 
+
 @cli.command(name="create")
 def create_database(): aiorun(database.create_all())
 @cli.command(name="drop")

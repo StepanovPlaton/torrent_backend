@@ -1,5 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import FastAPI
 import typer
 
 import cli_commands
@@ -13,4 +12,5 @@ app.include_router(files_router)
 cli = typer.Typer()
 cli.add_typer(cli_commands.cli, name="database")
 
-if(__name__ == "__main__"): cli()
+if (__name__ == "__main__"):
+    cli()

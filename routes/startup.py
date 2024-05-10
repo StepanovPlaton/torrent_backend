@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 from pathlib import Path
 
-router = APIRouter()
+startup_router = APIRouter()
 
-@router.on_event("startup")
+
+@startup_router.on_event("startup")
 def startup():
     need_paths = [
         Path() / "content" / "images" / "cover" / "full_size",
