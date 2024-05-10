@@ -2,8 +2,8 @@ from pydantic import BaseModel
 
 
 class GameBase(BaseModel):
-    cover: str | None = None
     title: str
+    cover: str | None = None
     description: str | None = None
     torrent_file: str
     language: str | None = None

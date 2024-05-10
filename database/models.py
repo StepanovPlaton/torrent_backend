@@ -10,7 +10,7 @@ class Game(Base):
 
     id = Column(Integer, primary_key=True)
     cover = Column(String)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     description = Column(String)
     torrent_file = Column(String, nullable=False)
     language = Column(String)
