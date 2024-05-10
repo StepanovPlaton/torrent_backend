@@ -1,22 +1,14 @@
-from typing import Union
-
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+import typer
 
-from database import *
+import cli_commands
+from routes import *
 
 app = FastAPI()
+app.include_router(games_router)
 
+cli = typer.Typer()
+cli.add_typer(cli_commands.cli, name="database")
 
-@app.on_event("startup")
-async def startup_event():
-    await init_models()
-
-
-@app.get("/users/{user_id}", response_model=User)
-async def read_user(user_id: int, db: AsyncSession = Depends(get_session)):
-    db_user = await get_user(db, user_id=user_id)
-    print(db_user)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+if(__name__ == "__main__"): cli()

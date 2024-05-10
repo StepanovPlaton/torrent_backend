@@ -1,5 +1,5 @@
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -9,8 +9,10 @@ class Game(Base):
     __tablename__ = "games"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
+    cover = Column(String)
+    title = Column(String, nullable=False)
     description = Column(String)
+    torrent_file = Column(String, nullable=False)
     language = Column(String)
     version = Column(String)
     download_size = Column(String)
@@ -30,8 +32,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True)
-    name = Column(String)
-    hash_of_password = Column(String)
+    email = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    hash_of_password = Column(String, nullable=False)
 
     games = relationship("Game", back_populates="owner")

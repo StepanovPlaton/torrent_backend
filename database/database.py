@@ -19,8 +19,23 @@ async def get_session() -> AsyncSession:  # type: ignore
     async with async_session() as session:  # type: ignore
         yield session
 
-
-async def init_models():
+async def drop_all():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+async def create_all():
+    async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+async def recreate_all():
+    await drop_all()
+    await create_all()
+    
+async def add_transaction[T](db: AsyncSession, entity: T) -> T:
+    try:
+        db.add(entity)
+        await db.commit()
+        await db.refresh(entity)
+        return entity
+    except Exception as ex:
+        await db.rollback()
+        raise ex

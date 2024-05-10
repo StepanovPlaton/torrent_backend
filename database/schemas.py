@@ -2,8 +2,10 @@ from pydantic import BaseModel
 
 
 class GameBase(BaseModel):
+    cover: str | None = None
     title: str
     description: str | None = None
+    torrent_file: str
     language: str | None = None
     version: str | None = None
     download_size: str | None = None
@@ -25,7 +27,7 @@ class Game(GameBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserBase(BaseModel):
@@ -42,4 +44,4 @@ class User(UserBase):
     games: list[Game] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
