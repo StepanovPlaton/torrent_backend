@@ -16,7 +16,8 @@ class Game(Base):
     language = Column(String)
     version = Column(String)
     download_size = Column(String)
-    upload_date = Column(String)
+    upload_date = Column(String, nullable=False)
+    release_date = Column(String)
 
     system = Column(String)
     processor = Column(String)

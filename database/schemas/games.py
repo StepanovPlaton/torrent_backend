@@ -1,28 +1,29 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
 class GameCardBase(BaseModel):
     title: str
-    cover: str | None = None
-    description: str | None = None
+    cover: Optional[str] = None
+    description: Optional[str] = None
+    release_date: Optional[str] = None
 
 
 class GameCard(GameCardBase):
     id: int
-    upload_date: str | None = None
 
 
 class GameBase(GameCardBase):
     torrent_file: str
-    language: str | None = None
-    version: str | None = None
-    download_size: str | None = None
+    language: Optional[str] = None
+    version: Optional[str] = None
+    download_size: Optional[str] = None
 
-    system: str | None = None
-    processor: str | None = None
-    memory: str | None = None
-    graphics: str | None = None
-    storage: str | None = None
+    system: Optional[str] = None
+    processor: Optional[str] = None
+    memory: Optional[str] = None
+    graphics: Optional[str] = None
+    storage: Optional[str] = None
 
 
 class GameCreate(GameBase):
