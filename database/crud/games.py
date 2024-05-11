@@ -1,3 +1,4 @@
+from time import strftime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -9,7 +10,9 @@ from ..database import add_transaction
 async def add_game(db: AsyncSession,
                    game_info: sch.GameCreate,
                    user_id: int):
-    game = mdl.Game(**game_info.model_dump(), owner_id=user_id)
+    game = mdl.Game(**game_info.model_dump(),
+                    upload_date=strftime("%Y-%m-%d %H:%M:%S"),
+                    owner_id=user_id)
     return await add_transaction(db, game)
 
 

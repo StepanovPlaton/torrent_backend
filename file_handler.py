@@ -9,11 +9,13 @@ from PIL import Image
 
 
 def create_hash_name(filename: str):
+    # TODO: Hash from file data
     return str(hashlib.sha1(filename.encode()).hexdigest())
 
 
 async def save_torrent_file(torrent: UploadFile):
-    if(torrent.filename is None): raise ValueError("Filename not found")
+    if (torrent.filename is None):
+        raise ValueError("Filename not found")
     hash_filename = create_hash_name(torrent.filename)+".torrent"
     async with aiofiles.open(Path() / "content" / "torrent"
                              / hash_filename, 'wb') as file:
@@ -25,13 +27,17 @@ async def save_torrent_file(torrent: UploadFile):
 
 
 async def save_image(cover: UploadFile, type: Literal["cover", "screenshot"]):
-    if(cover.filename is None): raise ValueError("Filename not found")
-    if(cover.content_type is None): raise ValueError("File content type unknown")
+    if (cover.filename is None):
+        raise ValueError("Filename not found")
+    if (cover.content_type is None):
+        raise ValueError("File content type unknown")
 
     hash_filename = create_hash_name(cover.filename)
     file_extension = mimetypes.guess_extension(cover.content_type)
-    if (file_extension is None): raise NameError("File extension not found")
-    else: hash_filename += file_extension
+    if (file_extension is None):
+        raise NameError("File extension not found")
+    else:
+        hash_filename += file_extension
 
     async with aiofiles.open(Path() / "content" / "images" / type / "full_size"
                              / hash_filename, 'wb') as full_size_file, \

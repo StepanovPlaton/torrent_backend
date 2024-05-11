@@ -1,15 +1,22 @@
 from pydantic import BaseModel
 
 
-class GameBase(BaseModel):
+class GameCardBase(BaseModel):
     title: str
     cover: str | None = None
     description: str | None = None
+
+
+class GameCard(GameCardBase):
+    id: int
+    upload_date: str | None = None
+
+
+class GameBase(GameCardBase):
     torrent_file: str
     language: str | None = None
     version: str | None = None
     download_size: str | None = None
-    upload_date: str | None = None
 
     system: str | None = None
     processor: str | None = None
@@ -24,24 +31,8 @@ class GameCreate(GameBase):
 
 class Game(GameBase):
     id: int
+    upload_date: str | None
     owner_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class UserBase(BaseModel):
-    email: str
-    name: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    games: list[Game] = []
 
     class Config:
         from_attributes = True

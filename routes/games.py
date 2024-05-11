@@ -14,6 +14,14 @@ async def get_games(db: AsyncSession = Depends(get_session)):
         raise HTTPException(500)
 
 
+@games_router.get("/cards", response_model=list[GameCard])
+async def get_games_cards(db: AsyncSession = Depends(get_session)):
+    try:
+        return await crud.get_games(db)
+    except Exception:
+        raise HTTPException(500)
+
+
 @games_router.get("/{game_id}", response_model=Game)
 async def get_game(game_id: int, db: AsyncSession = Depends(get_session)):
     return await crud.get_game(db, game_id)
