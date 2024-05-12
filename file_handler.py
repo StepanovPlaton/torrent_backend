@@ -46,18 +46,34 @@ async def save_image(cover: UploadFile, type: Literal["cover", "screenshot"]):
         cover_data = await cover.read()
         if (isinstance(cover_data, str)):
             raise ValueError("Invalid image file")
-        await full_size_file.write(cover_data)
-        image = Image.open(BytesIO(cover_data))
-        compressed_coefficient = (image.size[0] * image.size[1]) / (1280*720/4)
+
+        cover_full_size = Image.open(BytesIO(cover_data))
+        compressed_coefficient = (cover_full_size.size[0] * 
+                                  cover_full_size.size[1]) / (1920*1080)
         if (compressed_coefficient < 1):
             compressed_coefficient = 1
-        compressed_image = image.resize(
-            (int(image.size[0] / compressed_coefficient),
-                int(image.size[1] / compressed_coefficient))
+
+        cover_full_size = cover_full_size.resize(
+            (int(cover_full_size.size[0] / compressed_coefficient),
+                int(cover_full_size.size[1] / compressed_coefficient))
+        )
+        buf = BytesIO()
+        cover_full_size.save(
+            buf, format=cover.content_type.upper().replace("IMAGE/", ""))
+        await full_size_file.write(buf.getbuffer())
+
+        cover_preview = Image.open(BytesIO(cover_data))
+        compressed_coefficient /= 4
+        if (compressed_coefficient < 1):
+            compressed_coefficient = 1
+
+        cover_preview = cover_preview.resize(
+            (int(cover_preview.size[0] / compressed_coefficient),
+                int(cover_preview.size[1] / compressed_coefficient))
         )
 
         buf = BytesIO()
-        compressed_image.save(
+        cover_preview.save(
             buf, format=cover.content_type.upper().replace("IMAGE/", ""))
         await preview_file.write(buf.getbuffer())
         return hash_filename
