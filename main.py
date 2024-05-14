@@ -5,7 +5,14 @@ import typer
 import cli_commands
 from routes import *
 
-app = FastAPI()
+app = FastAPI(
+    title=".Torrent",
+    description=".Torrent - сервис обмена .torrent файлами видеоигр, фильмов и аудиокниг",
+    contact={
+        "name": "Платон (разработчик)",
+        "url": "https://github.com/StepanovPlaton"
+    },
+)
 app.include_router(startup_router)
 app.include_router(games_router)
 app.include_router(files_router)

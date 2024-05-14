@@ -1,5 +1,5 @@
 content/*
-dev_database.db
+dev_database*.db
 run.bat
 
 # Byte-compiled / optimized / DLL files

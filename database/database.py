@@ -15,7 +15,7 @@ Base = declarative_base()
 
 async def get_session() -> AsyncSession:  # type: ignore
     async with async_session() as session:  # type: ignore
-        yield session
+        yield session                       # type: ignore
 
 
 async def drop_all():

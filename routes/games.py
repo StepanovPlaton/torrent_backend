@@ -1,37 +1,36 @@
-from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends
 
-from database import *
+import database as db
 from file_handler import *
 
 games_router = APIRouter(prefix="/games", tags=["Games"])
 
 
-@games_router.get("/", response_model=list[Game])
-async def get_games(db: AsyncSession = Depends(get_session)):
-    try:
-        return await crud.get_games(db)
-    except Exception:
-        raise HTTPException(500)
+@games_router.get("/", response_model=list[db.Game])
+async def get_games(db_session: AsyncSession = Depends(db.get_session)):
+    return await db.get_games(db_session)
 
 
-@games_router.get("/cards", response_model=list[GameCard])
-async def get_games_cards(db: AsyncSession = Depends(get_session)):
-    try:
-        return await crud.get_games(db)
-    except Exception:
-        raise HTTPException(500)
+@games_router.get("/cards", response_model=list[db.GameCard])
+async def get_games_cards(db_session: AsyncSession = Depends(db.get_session)):
+    return await db.get_games(db_session)
 
 
-@games_router.get("/{game_id}", response_model=Game)
-async def get_game(game_id: int, db: AsyncSession = Depends(get_session)):
-    return await crud.get_game(db, game_id)
+@games_router.get("/{game_id}", response_model=db.Game)
+async def get_game(game_id: int, db_session: AsyncSession = Depends(db.get_session)):
+    return await db.get_game(db_session, game_id)
 
 
-@games_router.post("/", response_model=Game)
-async def add_game(game: GameCreate,
+@games_router.put("/{game_id}", response_model=db.Game)
+async def edit_game(game_id: int,
+                    game: db.GameCreate,
+                    db_session: AsyncSession = Depends(db.get_session)):
+    return await db.edit_game(db_session, game_id, game)
+
+
+@games_router.post("/", response_model=db.Game)
+async def add_game(game: db.GameCreate,
                    user_id: int,
-                   db: AsyncSession = Depends(get_session)):
-    try:
-        return await crud.add_game(db, game, user_id)
-    except Exception:
-        raise HTTPException(500)
+                   db_session: AsyncSession = Depends(db.get_session)):
+    return await db.add_game(db_session, game, user_id)

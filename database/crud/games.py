@@ -17,9 +17,22 @@ async def add_game(db: AsyncSession,
     return await add_transaction(db, game)
 
 
+async def edit_game(db: AsyncSession,
+                    game_id: int,
+                    game_info: sch.GameCreate):
+    game = await db.get(mdl.Game, game_id)
+    game_fields = [c.name for c in mdl.Game.__table__.columns]
+    new_game_info = {
+        **{k: v for k, v in vars(game).items() if k in game_fields},
+        **game_info.model_dump()}
+    print(game_fields, new_game_info)
+    game = mdl.Game(**new_game_info)
+    await db.commit()
+    return game
+
+
 async def get_games(db: AsyncSession):
     return (await db.execute(select(mdl.Game))).scalars().all()
 
-
-async def get_game(db: AsyncSession, game_id: int):
-    return await db.get(mdl.Game, game_id)
+    async def get_game(db: AsyncSession, game_id: int):
+        return await db.get(mdl.Game, game_id)
