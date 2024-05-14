@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 from pathlib import Path
 
+from env import Env
+
 startup_router = APIRouter()
 
 
-@startup_router.on_event("startup")
-def startup():
+def create_folders():
     need_paths = [
         Path() / "content" / "images" / "cover" / "full_size",
         Path() / "content" / "images" / "cover" / "preview",
@@ -15,3 +16,8 @@ def startup():
     ]
     for path in need_paths:
         path.mkdir(parents=True, exist_ok=True)
+
+
+@startup_router.on_event("startup")
+def startup():
+    create_folders()

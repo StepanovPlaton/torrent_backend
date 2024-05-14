@@ -7,6 +7,11 @@ import aiofiles
 from fastapi import UploadFile
 from PIL import Image
 
+from env import Env
+
+IMAGE_TARGET_SIZE = Env.get_strict("IMAGE_TARGET_SIZE", int)
+PREVIEW_TARGET_SIZE = Env.get_strict("PREVIEW_TARGET_SIZE", int)
+
 
 def create_hash_name(filename: str):
     # TODO: Hash from file data
@@ -48,8 +53,9 @@ async def save_image(cover: UploadFile, type: Literal["cover", "screenshot"]):
             raise ValueError("Invalid image file")
 
         cover_full_size = Image.open(BytesIO(cover_data))
-        compressed_coefficient = (cover_full_size.size[0] * 
-                                  cover_full_size.size[1]) / (1920*1080)
+        compressed_coefficient = \
+            (cover_full_size.size[0] * cover_full_size.size[1]
+             ) / IMAGE_TARGET_SIZE
         if (compressed_coefficient < 1):
             compressed_coefficient = 1
 
@@ -63,7 +69,9 @@ async def save_image(cover: UploadFile, type: Literal["cover", "screenshot"]):
         await full_size_file.write(buf.getbuffer())
 
         cover_preview = Image.open(BytesIO(cover_data))
-        compressed_coefficient /= 4
+        compressed_coefficient /= \
+            (cover_preview.size[0] * cover_preview.size[1]
+             ) / PREVIEW_TARGET_SIZE
         if (compressed_coefficient < 1):
             compressed_coefficient = 1
 

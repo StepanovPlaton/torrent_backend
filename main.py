@@ -16,6 +16,7 @@ app = FastAPI(
 app.include_router(startup_router)
 app.include_router(games_router)
 app.include_router(files_router)
+app.include_router(auth_router)
 app.mount("/content", StaticFiles(directory="content"), name="content")
 
 cli = typer.Typer()

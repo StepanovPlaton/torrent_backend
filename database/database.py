@@ -2,7 +2,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-DATABASE_URL = "sqlite+aiosqlite:///./dev_database.db"
+from env import Env
+
+DATABASE_URL = Env.get_strict("SQLALCHEMY_DATABASE_URL", str)
 # DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_async_engine(
