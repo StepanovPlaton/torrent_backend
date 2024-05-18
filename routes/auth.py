@@ -58,7 +58,8 @@ def create_token(user: db.User):
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.now(timezone.utc) + access_token_expires
     to_encode = {
-        "username": user.name,
+        "id": user.id,
+        "name": user.name,
         "email": user.email,
         "expire": str(expire)
     }
@@ -110,6 +111,6 @@ async def login_user(
     return create_token(user)
 
 
-@auth_router.get("/me", response_model=db.User)
+@auth_router.get("/me", response_model=db.UserOpenData)
 async def read_me(user: db.User = Depends(get_user)):
     return user
