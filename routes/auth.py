@@ -45,9 +45,11 @@ async def get_user(token: str = Depends(oauth2_scheme),
     try:
         payload = jwt.decode(token, SECRET_KEY)
         token_data = TokenData(**payload)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise credentials_exception
     user = await db.get_user(db_session, token_data.username)
+    print(user)
     if user is None:
         raise credentials_exception
     return user
@@ -59,7 +61,7 @@ def create_token(user: db.User):
     expire = datetime.now(timezone.utc) + access_token_expires
     to_encode = {
         "id": user.id,
-        "name": user.name,
+        "username": user.name,
         "email": user.email,
         "expire": str(expire)
     }

@@ -51,6 +51,7 @@ async def delete_game(game_id: int,
                       user: db.User = Depends(get_user),
                       db_session: AsyncSession = Depends(db.get_session)):
     game_db = await db.get_game(db_session, game_id)
+    print(game_db)
     if (game_db is None):
         raise HTTPException(status.HTTP_404_NOT_FOUND,
                             detail=f"Game with id={game_id} not found")
