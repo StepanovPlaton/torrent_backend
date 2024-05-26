@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from ..database import Base
 
+
 class Game(Base):
     __tablename__ = "games"
 
@@ -28,4 +29,3 @@ class Game(Base):
     download_size = Column(String)
 
     owner_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User", back_populates="games")

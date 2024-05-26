@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from ..database import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -10,5 +11,3 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)
     hash_of_password = Column(String, nullable=False)
-
-    games = relationship("Game", back_populates="owner")
