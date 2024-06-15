@@ -12,7 +12,8 @@ def create_folders():
         Path() / "content" / "images" / "cover" / "preview",
         Path() / "content" / "images" / "screenshot" / "full_size",
         Path() / "content" / "images" / "screenshot" / "preview",
-        Path() / "content" / "torrent"
+        Path() / "content" / "torrent",
+        Path() / "content" / "audio"
     ]
     for path in need_paths:
         path.mkdir(parents=True, exist_ok=True)

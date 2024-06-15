@@ -85,3 +85,25 @@ async def save_image(cover: UploadFile, type: Literal["cover", "screenshot"]):
             buf, format=cover.content_type.upper().replace("IMAGE/", ""))
         await preview_file.write(buf.getbuffer())
         return hash_filename
+
+
+async def save_audio_fragment(fragment: UploadFile):
+    if (fragment.filename is None):
+        raise ValueError("Filename not found")
+    if (fragment.content_type is None):
+        raise ValueError("File content type unknown")
+
+    hash_filename = create_hash_name(fragment.filename)
+    file_extension = mimetypes.guess_extension(fragment.content_type)
+    if (file_extension is None):
+        raise NameError("File extension not found")
+    else:
+        hash_filename += file_extension
+
+    async with aiofiles.open(Path() / "content" / "audio"
+                             / hash_filename, 'wb') as file:
+        fragment_data = await fragment.read()
+        if (isinstance(fragment_data, str)):
+            raise ValueError("Invalid audio file")
+        await file.write(fragment_data)
+        return hash_filename

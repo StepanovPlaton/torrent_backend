@@ -32,6 +32,7 @@ async def edit_game(db: AsyncSession,
     for key, value in vars(game_info).items():
         if (value and value is not None and getattr(game, key) != value):
             setattr(game, key, value)
+    setattr(game, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
     await db.commit()
     return game
 

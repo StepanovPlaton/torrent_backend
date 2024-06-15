@@ -12,7 +12,7 @@ async def upload_torrent(torrent: UploadFile):
         return await save_torrent_file(torrent)
     except Exception as ex:
         print(ex)
-        raise HTTPException(500)
+        raise HTTPException(500, detail=str(ex))
 
 
 @files_router.post("/cover", response_model=str)
@@ -21,4 +21,13 @@ async def upload_cover(cover: UploadFile):
         return await save_image(cover, "cover")
     except Exception as ex:
         print(ex)
-        raise HTTPException(500)
+        raise HTTPException(500, detail=str(ex))
+
+
+@files_router.post("/audio", response_model=str)
+async def upload_audio_fragment(fragment: UploadFile):
+    try:
+        return await save_audio_fragment(fragment)
+    except Exception as ex:
+        print(ex)
+        raise HTTPException(500, detail=str(ex))

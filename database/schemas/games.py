@@ -1,10 +1,9 @@
 from typing import Optional
-from fastapi import Body
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class GameCardBase(BaseModel):
-    title: str = Field(examples=["DwarfFortress", "RimWorld"])
+    title: str = Field(examples=["DwarfFortress"])
     cover: Optional[str] = \
         Field(default=None, examples=["cover_filename.jpg"])
     description: Optional[str] = \
