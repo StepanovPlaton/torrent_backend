@@ -49,7 +49,6 @@ async def get_user(token: str = Depends(oauth2_scheme),
         print(e)
         raise credentials_exception
     user = await db.get_user(db_session, token_data.username)
-    print(user)
     if user is None:
         raise credentials_exception
     return user

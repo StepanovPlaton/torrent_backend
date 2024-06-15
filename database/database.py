@@ -8,7 +8,7 @@ DATABASE_URL = Env.get_strict("SQLALCHEMY_DATABASE_URL", str)
 # DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_async_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
+    DATABASE_URL, connect_args={"check_same_thread": False}  # , echo=True
 )
 async_session = sessionmaker(  # type: ignore
     engine, class_=AsyncSession, expire_on_commit=False)  # type: ignore
