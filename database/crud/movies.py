@@ -30,7 +30,7 @@ async def edit_movie(db: AsyncSession,
                      movie_info: sch.MovieCreate):
     movie = await db.get(mdl.Movie, movie_id)
     for key, value in vars(movie_info).items():
-        if (value and value is not None and getattr(movie, key) != value):
+        if (getattr(movie, key) != value):
             setattr(movie, key, value)
     setattr(movie, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
     await db.commit()

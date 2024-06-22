@@ -30,7 +30,7 @@ async def edit_audiobook(db: AsyncSession,
                          audiobook_info: sch.AudiobookCreate):
     audiobook = await db.get(mdl.Audiobook, audiobook_id)
     for key, value in vars(audiobook_info).items():
-        if (value and value is not None and getattr(audiobook, key) != value):
+        if (getattr(audiobook, key) != value):
             setattr(audiobook, key, value)
     setattr(audiobook, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
     await db.commit()
