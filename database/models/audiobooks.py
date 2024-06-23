@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -14,7 +15,6 @@ class Audiobook(Base):
     author = Column(String)
 
     torrent_file = Column(String, nullable=False)
-    upload_date = Column(String, nullable=False)
     fragment = Column(String)
     update_date = Column(String, nullable=False)
     language = Column(String)
@@ -22,5 +22,8 @@ class Audiobook(Base):
     download_size = Column(String)
     duration = Column(String)
     reader = Column(String)
+
+    genres = relationship("AudiobookGenre", secondary="audiobook_to_genre",
+                          lazy="selectin")
 
     owner_id = Column(Integer, ForeignKey("users.id"))

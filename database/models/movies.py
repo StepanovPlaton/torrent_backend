@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -14,7 +15,6 @@ class Movie(Base):
     description = Column(String)
 
     torrent_file = Column(String, nullable=False)
-    upload_date = Column(String, nullable=False)
     trailer = Column(String)
     update_date = Column(String, nullable=False)
     language = Column(String)
@@ -24,5 +24,11 @@ class Movie(Base):
     director = Column(String)
     duration = Column(String)
     country = Column(String)
+
+    genres = relationship("MovieGenre", secondary="movie_to_genre",
+                          lazy="selectin")
+
+    actors = relationship("MovieActor", secondary="movie_to_actor",
+                          lazy="selectin")
 
     owner_id = Column(Integer, ForeignKey("users.id"))

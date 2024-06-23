@@ -1,6 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from .users import UserOpenData as User
+from .game_genres import GameGenre
+
 
 class GameCardBase(BaseModel):
     title: str = Field(examples=["DwarfFortress"])
@@ -40,13 +43,15 @@ class GameBase(GameCardBase):
 
 
 class GameCreate(GameBase):
-    pass
+    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
 
 
 class Game(GameBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-05-13 12:00:00"])
-    upload_date: str = Field(examples=["2024-05-13 12:00:00"])
-    owner_id: int = Field(examples=[1])
+
+    genres: list[GameGenre] = Field()
+
+    owner: User = Field()
 
     model_config = ConfigDict(from_attributes=True)

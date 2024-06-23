@@ -1,6 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from .users import UserOpenData as User
+from .audiobook_genres import AudiobookGenre
+
 
 class AudiobookCardBase(BaseModel):
     title: str = Field(examples=["Марсианин"])
@@ -39,13 +42,15 @@ class AudiobookBase(AudiobookCardBase):
 
 
 class AudiobookCreate(AudiobookBase):
-    pass
+    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
 
 
 class Audiobook(AudiobookBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-06-14 12:00:00"])
-    upload_date: str = Field(examples=["2024-06-14 12:00:00"])
-    owner_id: int = Field(examples=[1])
+
+    genres: list[AudiobookGenre] = Field()
+
+    owner: User = Field()
 
     model_config = ConfigDict(from_attributes=True)

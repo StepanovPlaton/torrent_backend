@@ -1,6 +1,7 @@
 from time import strftime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 from .. import models as mdl
 from .. import schemas as sch

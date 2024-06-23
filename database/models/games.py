@@ -1,4 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -11,7 +12,6 @@ class Game(Base):
     cover = Column(String)
     description = Column(String)
     torrent_file = Column(String, nullable=False)
-    upload_date = Column(String, nullable=False)
     trailer = Column(String)
 
     system = Column(String)
@@ -27,4 +27,8 @@ class Game(Base):
     release_date = Column(String)
     download_size = Column(String)
 
+    genres = relationship("GameGenre", secondary="game_to_genre",
+                          lazy="selectin")
+
     owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", lazy="selectin", viewonly=True)

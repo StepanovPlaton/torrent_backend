@@ -1,6 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from .users import UserOpenData as User
+from .movie_genres import MovieGenre
+from .movie_actors import MovieActor
+
 
 class MovieCardBase(BaseModel):
     title: str = Field(examples=["Интерстеллар"])
@@ -43,13 +47,17 @@ class MovieBase(MovieCardBase):
 
 
 class MovieCreate(MovieBase):
-    pass
+    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
+    actors: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
 
 
 class Movie(MovieBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-06-11 12:00:00"])
-    upload_date: str = Field(examples=["2024-06-11 12:00:00"])
-    owner_id: int = Field(examples=[1])
+
+    genres: list[MovieGenre] = Field()
+    actors: list[MovieActor] = Field()
+
+    owner: User = Field()
 
     model_config = ConfigDict(from_attributes=True)
