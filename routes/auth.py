@@ -1,13 +1,12 @@
-from typing import Annotated, Any
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
-from jose import JWTError, jwt
+from jose import jwt
 
-import database as db
+from database import *
 from env import Env
 
 SECRET_KEY = Env.get_strict("JWT_SECRET_KEY", str)
@@ -36,7 +35,7 @@ def get_hash(password): return crypt.hash(password)
 
 
 async def get_user(token: str = Depends(oauth2_scheme),
-                   db_session: AsyncSession = Depends(db.get_session)):
+                   db_session: AsyncSession = Depends(Database.get_session)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -48,13 +47,13 @@ async def get_user(token: str = Depends(oauth2_scheme),
     except Exception as e:
         print(e)
         raise credentials_exception
-    user = await db.get_user(db_session, token_data.username)
+    user = await UsersCRUD.get(db_session, token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-def create_token(user: db.User):
+def create_token(user: User):
     access_token_expires = \
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.now(timezone.utc) + access_token_expires
@@ -70,33 +69,33 @@ def create_token(user: db.User):
 
 @auth_router.post("/registration")
 async def registration_user(
-    user_data: db.UserCreate,
-    db_session: AsyncSession = Depends(db.get_session)
+    user_data: UserCreate,
+    db_session: AsyncSession = Depends(Database.get_session)
 ) -> Token:
-    if (not await db.check_email(db_session, user_data.email)):
+    if (not await UsersCRUD.check_email(db_session, user_data.email)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="This email is occupied by another user",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    elif (await db.get_user(db_session, user_data.name) is not None):
+    elif (await UsersCRUD.get(db_session, user_data.name) is not None):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User with the same name already exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
     else:
-        user = await db.add_user(db_session, user_data,
-                                 get_hash(user_data.password))
+        user = await UsersCRUD.add(db_session, user_data,
+                                   get_hash(user_data.password))
         return create_token(user)
 
 
 @auth_router.post("")
 async def login_user(
     auth_data: OAuth2PasswordRequestForm = Depends(),
-    db_session: AsyncSession = Depends(db.get_session)
+    db_session: AsyncSession = Depends(Database.get_session)
 ) -> Token:
-    user = await db.get_user(db_session, auth_data.username)
+    user = await UsersCRUD.get(db_session, auth_data.username)
     if (user is None):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -112,6 +111,6 @@ async def login_user(
     return create_token(user)
 
 
-@auth_router.get("/me", response_model=db.UserOpenData)
-async def read_me(user: db.User = Depends(get_user)):
+@auth_router.get("/me", response_model=UserOpenData)
+async def read_me(user: User = Depends(get_user)):
     return user

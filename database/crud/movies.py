@@ -1,45 +1,58 @@
 from time import strftime
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+
+from database.crud.movie_actors import MovieActorsCRUD
+from database.crud.movie_genres import MovieGenresCRUD
+from database.database import Database, EntityCRUD
 
 from .. import models as mdl
 from .. import schemas as sch
-from ..database import add_transaction
 
 
-async def get_movies(db: AsyncSession):
-    return (await db.execute(select(mdl.Movie))).scalars().all()
+class MoviesCRUD(EntityCRUD[mdl.Movie]):
+    @staticmethod
+    async def get(db: AsyncSession, id: int):
+        return await Database.get(db, mdl.Movie, id)
 
+    @staticmethod
+    async def get_all(db: AsyncSession):
+        return await Database.get_all(db, mdl.Movie)
 
-async def get_movie(db: AsyncSession, movie_id: int):
-    return await db.get(mdl.Movie, movie_id)
+    @staticmethod
+    async def change_actors(db: AsyncSession, movie: mdl.Movie, info: sch.MovieCreate):
+        movie_actors = await MovieActorsCRUD.get_all(db)
+        if (info.actors):
+            movie.actors = [
+                actor for actor in movie_actors if actor.id in info.actors]
 
+    @staticmethod
+    async def change_genres(db: AsyncSession, movie: mdl.Movie, info: sch.MovieCreate):
+        movie_genres = await MovieGenresCRUD.get_all(db)
+        if (info.genres):
+            movie.genres = [
+                genre for genre in movie_genres if genre.id in info.genres]
 
-async def add_movie(db: AsyncSession,
-                    movie_info: sch.MovieCreate,
-                    user_id: int):
-    movie = mdl.Movie(**movie_info.model_dump(),
-                      update_date=strftime("%Y-%m-%d %H:%M:%S"),
-                      upload_date=strftime("%Y-%m-%d %H:%M:%S"),
-                      owner_id=user_id)
-    return await add_transaction(db, movie)
+    @staticmethod
+    async def add(db: AsyncSession,
+                  info: sch.MovieCreate,
+                  owner_id: int):
+        movie = mdl.Movie(**info.model_dump(),
+                          update_date=strftime("%Y-%m-%d %H:%M:%S"),
+                          owner_id=owner_id)
+        await MoviesCRUD.change_genres(db, movie, info)
+        await MoviesCRUD.change_actors(db, movie, info)
+        return await Database.add(db, movie)
 
+    @staticmethod
+    async def change(db: AsyncSession,
+                     id: int,
+                     info: sch.MovieCreate):
+        async def additional_change(db: AsyncSession, movie: mdl.Movie, info: sch.MovieCreate):
+            await MoviesCRUD.change_genres(db, movie, info)
+            await MoviesCRUD.change_actors(db, movie, info)
+        return await Database.change(db, mdl.Movie, id, info, additional_change)
 
-async def edit_movie(db: AsyncSession,
-                     movie_id: int,
-                     movie_info: sch.MovieCreate):
-    movie = await db.get(mdl.Movie, movie_id)
-    for key, value in vars(movie_info).items():
-        if (getattr(movie, key) != value):
-            setattr(movie, key, value)
-    setattr(movie, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
-    await db.commit()
-    return movie
-
-
-async def delete_movie(db: AsyncSession,
-                       movie_id: int):
-    movie = await get_movie(db, movie_id)
-    await db.delete(movie)
-    await db.commit()
-    return movie
+    @staticmethod
+    async def delete(db: AsyncSession,
+                     id: int):
+        return await Database.delete(db, mdl.Movie, id)

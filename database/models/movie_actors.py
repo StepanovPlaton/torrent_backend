@@ -10,8 +10,8 @@ class MovieActor(Base):
     id = Column(Integer, primary_key=True)
     actor = Column(String, nullable=False, unique=True)
 
-    movies = relationship("Movies", secondary="movie_to_actor",
-                          lazy="selectin")
+    movies = relationship("Movie", secondary="movie_to_actor",
+                          lazy="selectin", viewonly=True)
 
 
 class MovieToActor(Base):

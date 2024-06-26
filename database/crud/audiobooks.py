@@ -1,45 +1,46 @@
 from time import strftime
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+
+from database.crud.audiobook_genres import AudiobookGenresCRUD
+from database.database import Database, EntityCRUD
 
 from .. import models as mdl
 from .. import schemas as sch
-from ..database import add_transaction
 
 
-async def get_audiobooks(db: AsyncSession):
-    return (await db.execute(select(mdl.Audiobook))).scalars().all()
+class AudiobooksCRUD(EntityCRUD[mdl.Audiobook]):
+    @staticmethod
+    async def get(db: AsyncSession, id: int):
+        return await Database.get(db, mdl.Audiobook, id)
 
+    @staticmethod
+    async def get_all(db: AsyncSession):
+        return await Database.get_all(db, mdl.Audiobook)
 
-async def get_audiobook(db: AsyncSession, audiobook_id: int):
-    return await db.get(mdl.Audiobook, audiobook_id)
+    @staticmethod
+    async def change_genres(db: AsyncSession, audiobook: mdl.Audiobook, info: sch.AudiobookCreate):
+        audiobook_genres = await AudiobookGenresCRUD.get_all(db)
+        if (info.genres):
+            audiobook.genres = [
+                genre for genre in audiobook_genres if genre.id in info.genres]
 
+    @staticmethod
+    async def add(db: AsyncSession,
+                  info: sch.AudiobookCreate,
+                  owner_id: int):
+        audiobook = mdl.Audiobook(**info.model_dump(),
+                                  update_date=strftime("%Y-%m-%d %H:%M:%S"),
+                                  owner_id=owner_id)
+        await AudiobooksCRUD.change_genres(db, audiobook, info)
+        return await Database.add(db, audiobook)
 
-async def add_audiobook(db: AsyncSession,
-                        audiobook_info: sch.AudiobookCreate,
-                        user_id: int):
-    audiobook = mdl.Audiobook(**audiobook_info.model_dump(),
-                              update_date=strftime("%Y-%m-%d %H:%M:%S"),
-                              upload_date=strftime("%Y-%m-%d %H:%M:%S"),
-                              owner_id=user_id)
-    return await add_transaction(db, audiobook)
+    @staticmethod
+    async def change(db: AsyncSession,
+                     id: int,
+                     info: sch.AudiobookCreate):
+        return await Database.change(db, mdl.Audiobook, id, info, AudiobooksCRUD.change_genres)
 
-
-async def edit_audiobook(db: AsyncSession,
-                         audiobook_id: int,
-                         audiobook_info: sch.AudiobookCreate):
-    audiobook = await db.get(mdl.Audiobook, audiobook_id)
-    for key, value in vars(audiobook_info).items():
-        if (getattr(audiobook, key) != value):
-            setattr(audiobook, key, value)
-    setattr(audiobook, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
-    await db.commit()
-    return audiobook
-
-
-async def delete_audiobook(db: AsyncSession,
-                           audiobook_id: int):
-    audiobook = await get_audiobook(db, audiobook_id)
-    await db.delete(audiobook)
-    await db.commit()
-    return audiobook
+    @staticmethod
+    async def delete(db: AsyncSession,
+                     id: int):
+        return await Database.delete(db, mdl.Audiobook, id)

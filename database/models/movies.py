@@ -32,3 +32,4 @@ class Movie(Base):
                           lazy="selectin")
 
     owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", lazy="selectin", viewonly=True)

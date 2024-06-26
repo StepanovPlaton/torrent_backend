@@ -11,7 +11,7 @@ class GameGenre(Base):
     genre = Column(String, nullable=False, unique=True)
 
     games = relationship("Game", secondary="game_to_genre",
-                         lazy="selectin")
+                         lazy="selectin", viewonly=True)
 
 
 class GameToGenre(Base):

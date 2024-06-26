@@ -13,10 +13,19 @@ app = FastAPI(
         "url": "https://github.com/StepanovPlaton"
     },
 )
+
 app.include_router(startup_router)
+
 app.include_router(games_router)
+app.include_router(game_genres_router)
+
 app.include_router(movies_router)
+app.include_router(movie_actors_router)
+app.include_router(movie_genres_router)
+
 app.include_router(audiobooks_router)
+app.include_router(audiobook_genres_router)
+
 app.include_router(files_router)
 app.include_router(auth_router)
 app.mount("/content", StaticFiles(directory="content"), name="content")

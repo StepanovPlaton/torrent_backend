@@ -1,46 +1,46 @@
 from time import strftime
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
+
+from database.crud.game_genres import GameGenresCRUD
+from database.database import Database, EntityCRUD
 
 from .. import models as mdl
 from .. import schemas as sch
-from ..database import add_transaction
 
 
-async def get_games(db: AsyncSession):
-    return (await db.execute(select(mdl.Game))).scalars().all()
+class GamesCRUD(EntityCRUD[mdl.Game]):
+    @staticmethod
+    async def get(db: AsyncSession, id: int):
+        return await Database.get(db, mdl.Game, id)
 
+    @staticmethod
+    async def get_all(db: AsyncSession):
+        return await Database.get_all(db, mdl.Game)
 
-async def get_game(db: AsyncSession, game_id: int):
-    return await db.get(mdl.Game, game_id)
+    @staticmethod
+    async def change_genres(db: AsyncSession, game: mdl.Game, info: sch.GameCreate):
+        game_genres = await GameGenresCRUD.get_all(db)
+        if (info.genres):
+            game.genres = [
+                genre for genre in game_genres if genre.id in info.genres]
 
+    @staticmethod
+    async def add(db: AsyncSession,
+                  info: sch.GameCreate,
+                  owner_id: int):
+        game = mdl.Game(**info.model_dump(),
+                        update_date=strftime("%Y-%m-%d %H:%M:%S"),
+                        owner_id=owner_id)
+        await GamesCRUD.change_genres(db, game, info)
+        return await Database.add(db, game)
 
-async def add_game(db: AsyncSession,
-                   game_info: sch.GameCreate,
-                   user_id: int):
-    game = mdl.Game(**game_info.model_dump(),
-                    update_date=strftime("%Y-%m-%d %H:%M:%S"),
-                    upload_date=strftime("%Y-%m-%d %H:%M:%S"),
-                    owner_id=user_id)
-    return await add_transaction(db, game)
+    @staticmethod
+    async def change(db: AsyncSession,
+                     id: int,
+                     info: sch.GameCreate):
+        return await Database.change(db, mdl.Game, id, info, GamesCRUD.change_genres)
 
-
-async def edit_game(db: AsyncSession,
-                    game_id: int,
-                    game_info: sch.GameCreate):
-    game = await db.get(mdl.Game, game_id)
-    for key, value in vars(game_info).items():
-        if (getattr(game, key) != value):
-            setattr(game, key, value)
-    setattr(game, "update_date", strftime("%Y-%m-%d %H:%M:%S"))
-    await db.commit()
-    return game
-
-
-async def delete_game(db: AsyncSession,
-                      game_id: int):
-    game = await get_game(db, game_id)
-    await db.delete(game)
-    await db.commit()
-    return game
+    @staticmethod
+    async def delete(db: AsyncSession,
+                     id: int):
+        return await Database.delete(db, mdl.Game, id)

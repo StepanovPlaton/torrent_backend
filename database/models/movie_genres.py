@@ -10,8 +10,8 @@ class MovieGenre(Base):
     id = Column(Integer, primary_key=True)
     genre = Column(String, nullable=False, unique=True)
 
-    movies = relationship("Movies", secondary="movie_to_genre",
-                          lazy="selectin")
+    movies = relationship("Movie", secondary="movie_to_genre",
+                          lazy="selectin", viewonly=True)
 
 
 class MovieToGenre(Base):

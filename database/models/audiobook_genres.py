@@ -11,7 +11,7 @@ class AudiobookGenre(Base):
     genre = Column(String, nullable=False, unique=True)
 
     audiobooks = relationship("Audiobook", secondary="audiobook_to_genre",
-                              lazy="selectin")
+                              lazy="selectin", viewonly=True)
 
 
 class AudiobookToGenre(Base):
