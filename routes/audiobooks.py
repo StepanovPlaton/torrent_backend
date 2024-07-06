@@ -13,13 +13,8 @@ async def get_audiobook(audiobook_id: int, db_session: AsyncSession = Depends(Da
     return await AudiobooksCRUD.get(db_session, audiobook_id)
 
 
-@audiobooks_router.get("/cards", response_model=list[AudiobookCard])
+@audiobooks_router.get("", response_model=list[AudiobookCard])
 async def get_audiobooks_cards(db_session: AsyncSession = Depends(Database.get_session)):
-    return await AudiobooksCRUD.get_all(db_session)
-
-
-@audiobooks_router.get("", response_model=list[Audiobook])
-async def get_audiobooks(db_session: AsyncSession = Depends(Database.get_session)):
     return await AudiobooksCRUD.get_all(db_session)
 
 

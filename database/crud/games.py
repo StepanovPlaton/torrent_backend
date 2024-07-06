@@ -21,14 +21,18 @@ class GamesCRUD(EntityCRUD[mdl.Game]):
     async def change_genres(db: AsyncSession, game: mdl.Game, info: sch.GameCreate):
         game_genres = await GameGenresCRUD.get_all(db)
         if (info.genres):
+            genres_id = [genre.id for genre in info.genres]
             game.genres = [
-                genre for genre in game_genres if genre.id in info.genres]
+                genre for genre in game_genres if genre.id in genres_id]
 
     @staticmethod
     async def add(db: AsyncSession,
                   info: sch.GameCreate,
                   owner_id: int):
-        game = mdl.Game(**info.model_dump(),
+        game_data_db = \
+            {k: v for k, v in info.model_dump().items()
+             if not k in ["genres", "update_date"]}
+        game = mdl.Game(**game_data_db,
                         update_date=strftime("%Y-%m-%d %H:%M:%S"),
                         owner_id=owner_id)
         await GamesCRUD.change_genres(db, game, info)

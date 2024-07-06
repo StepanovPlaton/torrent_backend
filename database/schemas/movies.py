@@ -45,18 +45,17 @@ class MovieBase(MovieCardBase):
     country: Optional[str] = \
         Field(default=None, examples=["США, Великобритания, Канада"])
 
+    genres: Optional[list[MovieGenre]] = Field()
+    actors: Optional[list[MovieActor]] = Field()
+
 
 class MovieCreate(MovieBase):
-    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
-    actors: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
+    ...
 
 
 class Movie(MovieBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-06-11 12:00:00"])
-
-    genres: list[MovieGenre] = Field()
-    actors: list[MovieActor] = Field()
 
     owner: User = Field()
 

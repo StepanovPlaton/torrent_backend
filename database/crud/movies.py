@@ -22,21 +22,26 @@ class MoviesCRUD(EntityCRUD[mdl.Movie]):
     async def change_actors(db: AsyncSession, movie: mdl.Movie, info: sch.MovieCreate):
         movie_actors = await MovieActorsCRUD.get_all(db)
         if (info.actors):
+            actors_id = [actor.id for actor in info.actors]
             movie.actors = [
-                actor for actor in movie_actors if actor.id in info.actors]
+                actor for actor in movie_actors if actor.id in actors_id]
 
     @staticmethod
     async def change_genres(db: AsyncSession, movie: mdl.Movie, info: sch.MovieCreate):
         movie_genres = await MovieGenresCRUD.get_all(db)
         if (info.genres):
+            genres_id = [genre.id for genre in info.genres]
             movie.genres = [
-                genre for genre in movie_genres if genre.id in info.genres]
+                genre for genre in movie_genres if genre.id in genres_id]
 
     @staticmethod
     async def add(db: AsyncSession,
                   info: sch.MovieCreate,
                   owner_id: int):
-        movie = mdl.Movie(**info.model_dump(),
+        movie_data_db = \
+            {k: v for k, v in info.model_dump().items()
+             if not k in ["actors", "genres", "update_date"]}
+        movie = mdl.Movie(**movie_data_db,
                           update_date=strftime("%Y-%m-%d %H:%M:%S"),
                           owner_id=owner_id)
         await MoviesCRUD.change_genres(db, movie, info)

@@ -14,13 +14,8 @@ async def get_game(game_id: int, db_session: AsyncSession = Depends(Database.get
     return await GamesCRUD.get(db_session, game_id)
 
 
-@games_router.get("/cards", response_model=list[GameCard])
+@games_router.get("", response_model=list[GameCard])
 async def get_games_cards(db_session: AsyncSession = Depends(Database.get_session)):
-    return await GamesCRUD.get_all(db_session)
-
-
-@games_router.get("", response_model=list[Game])
-async def get_games(db_session: AsyncSession = Depends(Database.get_session)):
     return await GamesCRUD.get_all(db_session)
 
 

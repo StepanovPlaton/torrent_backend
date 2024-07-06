@@ -40,16 +40,16 @@ class AudiobookBase(AudiobookCardBase):
     duration: Optional[str] = Field(default=None, examples=["12:38"])
     reader: Optional[str] = Field(default=None, examples=["Дмитрий Хазанович"])
 
+    genres: Optional[list[AudiobookGenre]] = Field()
+
 
 class AudiobookCreate(AudiobookBase):
-    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
+    ...
 
 
 class Audiobook(AudiobookBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-06-14 12:00:00"])
-
-    genres: list[AudiobookGenre] = Field()
 
     owner: User = Field()
 

@@ -13,13 +13,8 @@ async def get_movie(movie_id: int, db_session: AsyncSession = Depends(Database.g
     return await MoviesCRUD.get(db_session, movie_id)
 
 
-@movies_router.get("/cards", response_model=list[MovieCard])
+@movies_router.get("", response_model=list[MovieCard])
 async def get_movies_cards(db_session: AsyncSession = Depends(Database.get_session)):
-    return await MoviesCRUD.get_all(db_session)
-
-
-@movies_router.get("", response_model=list[Movie])
-async def get_movies(db_session: AsyncSession = Depends(Database.get_session)):
     return await MoviesCRUD.get_all(db_session)
 
 

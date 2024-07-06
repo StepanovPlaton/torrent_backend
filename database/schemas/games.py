@@ -41,16 +41,16 @@ class GameBase(GameCardBase):
     release_date: Optional[str] = Field(default=None, examples=["2014"])
     download_size: Optional[str] = Field(default=None, examples=["80Mb"])
 
+    genres: Optional[list[GameGenre]] = Field()
+
 
 class GameCreate(GameBase):
-    genres: Optional[list[int]] = Field(default=None, examples=[[1, 2]])
+    ...
 
 
 class Game(GameBase):
     id: int = Field(examples=[1])
     update_date: str = Field(examples=["2024-05-13 12:00:00"])
-
-    genres: list[GameGenre] = Field()
 
     owner: User = Field()
 
